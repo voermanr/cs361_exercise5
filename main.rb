@@ -22,18 +22,16 @@ class LaunchDiscussionWorkflow
   end
 
   def generate_participant_users_from_email_string
-    return if @participants_email_string.blank?
+    user_generator = UserGenerator.new
 
-    @participants_email_string.split.uniq.map do |email_address|
-      User.new(email_address)
-    end
+    UserGenerator.generate_users_from_email(@participants_email_string)
   end
 
-  # ...
+  # ... @participants must be filled in here with some magic
 end
 
 discussion = Discussion.new(title: 'fake')
-host = User.find(42)
+host = Host.find(42)
 participants = "fake1@example.com\nfake2@example.com\nfake3@example.com"
 
 workflow = LaunchDiscussionWorkflow.new(discussion, host, participants)
@@ -45,5 +43,18 @@ class User
   def initialize(email)
     @email_address = email.downcase
     @password = Devise.friendly_token
+  end
+end
+
+class Host < User
+end
+
+class UserGenerator
+  def generate_users_from_email(participants_email_string)
+    return if participants_email_string.blank?
+
+    participants_email_string.split.uniq.map do |email_address|
+      User.new(email_address)
+    end
   end
 end
