@@ -25,7 +25,7 @@ class LaunchDiscussionWorkflow
     return if @participants_email_string.blank?
 
     @participants_email_string.split.uniq.map do |email_address|
-      User.create(email: email_address.downcase, password: Devise.friendly_token)
+      User.new(email_address)
     end
   end
 
@@ -39,3 +39,11 @@ participants = "fake1@example.com\nfake2@example.com\nfake3@example.com"
 workflow = LaunchDiscussionWorkflow.new(discussion, host, participants)
 workflow.generate_participant_users_from_email_string
 workflow.run
+
+# changed User class implementation
+class User
+  def initialize(email)
+    @email_address = email.downcase
+    @password = Devise.friendly_token
+  end
+end
